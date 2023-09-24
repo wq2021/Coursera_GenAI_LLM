@@ -186,13 +186,13 @@ In contrast to pre-training, where you train the LLM using vast amounts of unstr
 
 
 
-**What is instruction fine-tuning ? **
+**What is instruction fine-tuning ?**
 
 **Instruction fine-tuning trains the model using examples that demonstrate how it should respond to a specific instruction.** Fine-tuning with instruction prompts is the most common way to fine-tune LLMs these days. From this point on, when you hear or see the term fine-tuning, you can assume that it always means instruction fine tuning.
 
 
 
-**How does instruction fine-tuning work? **
+**How does instruction fine-tuning work?**
 
 1. Prepare and split data
 
@@ -214,7 +214,7 @@ Catastrophic forgetting is the full fine-tuning process modifies the weights of 
 
 
 
-**How to avoid catastrophic forgetting ? **
+**How to avoid catastrophic forgetting ?**
 
 - You might not have to.
 - **Fine-tune on multiple tasks at the same time**.
@@ -222,13 +222,13 @@ Catastrophic forgetting is the full fine-tuning process modifies the weights of 
 
 
 
-**What is FLAN ? **
+**What is FLAN ?**
 
 FLAN, which stands for Fine-tuned LAnguage Net, is a specific set of instructions used to fine-tune different models. As an **instruction finetuning method**, it presents the results of its application. The study demonstrates that by fine-tuning the 540B PaLM model on 1836 tasks while incorporating Chain-of-Thought Reasoning data, FLAN achieves improvements in generalization, human usability, and zero-shot reasoning over the base model. 
 
 
 
-**What are the evaluation metrics that we can use to mesure different task of LLM ? **
+**What are the evaluation metrics that we can use to mesure different task of LLM ?**
 
 Use **ROUGE** for diagnostic evaluation of **summarization tasks** and **BLEU** for **translation tasks**. 
 
@@ -272,7 +272,7 @@ This model has the same number of parameters as the original, so there is little
 
 
 
-**How does rank decompostion matrices works in LoRA ? **
+**How does rank decompostion matrices works in LoRA ?**
 
 Let's look at a practical example using the transformer architecture described in the Attention is All You Need paper. The paper specifies that the transformer weights have dimensions of 512 by 64. This means that each weights matrix has 32,768 trainable parameters. 
 
@@ -296,7 +296,7 @@ You can also **combine LoRA with the quantization techniques to further reduce y
 
 
 
-**What is the limitation of prompt engineering ? **
+**What is the limitation of prompt engineering ?**
 
 Require a lot of **manual effort** to write and try different prompts, and the **length of context window is limited**. 
 
@@ -322,13 +322,13 @@ One potential issue to consider is the **interpretability of learned virtual tok
 
 ### Week3 :  Reinforcement learning and LLM-powered applications
 
-**What is the adavantage of aligning models with human values ? **
+**What is the adavantage of aligning models with human values ?**
 
 Additional fine-tuning with human feedback helps to better align models with human preferences and to **increase the helpfulness, honesty, and harmlessness of the completions**. This further training can also help to **decrease the toxicity**, often models responses and **reduce the generation of incorrect information**. 
 
 
 
-**How does RLHF work ? **
+**How does RLHF work ?**
 
 RLHF (Reinforcement Learning from Human Feedback) is a popular technique to finetune LLM with human feedback. In RLHF, **human labelers score a dataset of completions by the original model based on alignment criteria like helpfulness, harmlessness, and honesty**. This dataset is used to train the reward model that scores the model completions during the RLHF process.
 
@@ -396,7 +396,7 @@ inference latency  = inference time
 
 
 
-**What is the limitation of LLM and how could we reduce the negative effects ? **
+**What is the limitation of LLM and how could we reduce the negative effects ?**
 
 **LLMs do not carry out mathematical operations**. They are still just trying to predict the next best token based on their training, and as a result, can easily get the answer wrong. 
 
