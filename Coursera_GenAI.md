@@ -10,23 +10,13 @@
   - chatbot
   - generate images
 
-* GenAI works by **finding stastical patterns and massive dataset of content**.
+* GenAI works by **finding stastical patterns from massive dataset of content**.
 
 * LLM have been trained on trillons of words with large amounts of computer power, billions of params.
 
 * Foundation / base models : GPT, BERT, FLAN-T5, PaLM, LLaMa, BLOOM
 
 To interact LLM, you write computer code with formalized syntax to interact with libraries and APIs. 
-
-
-
-**What is prompt ?**
-
-**The text that you pass to an LLM** is known as a prompt. The space or memory that is available to the prompt is called the **context window**, and this is typically large enough for a few thousand words, but differs from model to model.
-
-The model then predicts the next words, and because your prompt contained a question, this model generates an answer.
-
-The output of the model is called a **completion**, and the act of using the model to generate text is known as **inference**.
 
 
 
@@ -81,9 +71,19 @@ The Transformer architecture consists of an encoder and a decoder, each of which
 
 
 
+**What is prompt ?**
+
+**The text that you pass to an LLM** is known as a prompt. The space or memory that is available to the prompt is called the **context window**, and this is typically large enough for a few thousand words, but differs from model to model.
+
+The model then predicts the next words, and because your prompt contained a question, this model generates an answer.
+
+The output of the model is called a **completion**, and the act of using the model to generate text is known as **inference**.
+
+
+
 **Prompt and prompt engineering**
 
-The text feed into the model is called the **prompt**, the act of generating text is known as **inference**, and the output text is known as the **completion**. The work to develop and improve the prompt is known as **prompt engineering**. 
+The work to develop and improve the prompt is known as **prompt engineering**. 
 
 **In-context learning** provides examples inside the context window.
 
@@ -152,8 +152,8 @@ Giga byte > terabyte > petabyte
 Thare are some computational challenges of training LLMs, such as GPU memory during training for string model weights, to reduce the memory required during training, we introduce a technique called **quantization** :
 
 - reduce required memory to store and train models
-- projects original 32-bit flotting point numbers into lower precision spaces
-- quantization-awre training (QAT) learns the quantization scaling during training
+- projects original 32-bit floating point numbers into lower precision spaces
+- quantization-aware training (QAT) learns the quantization scaling during training
 - **BFFLOAT16** is a popular choice
 
 What else ? 
@@ -186,13 +186,13 @@ In contrast to pre-training, where you train the LLM using vast amounts of unstr
 
 
 
-**What is instruction fine-tuning ?**
+**What is instruction fine-tuning ? **
 
 **Instruction fine-tuning trains the model using examples that demonstrate how it should respond to a specific instruction.** Fine-tuning with instruction prompts is the most common way to fine-tune LLMs these days. From this point on, when you hear or see the term fine-tuning, you can assume that it always means instruction fine tuning.
 
 
 
-**How does instruction fine-tuning work?**
+**How does instruction fine-tuning work? **
 
 1. Prepare and split data
 
@@ -214,7 +214,7 @@ Catastrophic forgetting is the full fine-tuning process modifies the weights of 
 
 
 
-**How to avoid catastrophic forgetting ?**
+**How to avoid catastrophic forgetting ? **
 
 - You might not have to.
 - **Fine-tune on multiple tasks at the same time**.
@@ -222,15 +222,15 @@ Catastrophic forgetting is the full fine-tuning process modifies the weights of 
 
 
 
-**What is FLAN ?**
+**What is FLAN ? **
 
 FLAN, which stands for Fine-tuned LAnguage Net, is a specific set of instructions used to fine-tune different models. As an **instruction finetuning method**, it presents the results of its application. The study demonstrates that by fine-tuning the 540B PaLM model on 1836 tasks while incorporating Chain-of-Thought Reasoning data, FLAN achieves improvements in generalization, human usability, and zero-shot reasoning over the base model. 
 
 
 
-**What are the evaluation metrics that we can use to mesure different task of LLM ?**
+**What are the evaluation metrics that we can use to mesure different task of LLM ? **
 
-Use **ROUGE** for diagnostic evaluation of **summarization tasks** and **BLEU** for **translation tasks**. 
+Use **ROUGE** for diagnostic evaluation of **summarization tasks** and **BLEU** for **translation tasks**. Other than that, there are some benchmarks that we can use to mesure and compare the performance of model.
 
 
 
@@ -250,7 +250,7 @@ Use **ROUGE** for diagnostic evaluation of **summarization tasks** and **BLEU** 
 
 **How does PEFT work ?**
 
-With PEFT, most if not all of the LLM weights are kept frozen. As a result, the number of trained parameters is much smaller than the number of parameters in the original LLM. In some cases, **just 15-20% of the original LLM weights**. This makes the **memory requirements for training much more manageable**. 
+With PEFT, most of the LLM weights are kept frozen. As a result, the number of trained parameters is much smaller than the number of parameters in the original LLM. In some cases, **just 15-20% of the original LLM weights**. This makes the **memory requirements for training much more manageable**. 
 
 In fact, **PEFT can often be performed on a single GPU**. And because the original LLM is only slightly modified or left unchanged, PEFT is less prone to the catastrophic forgetting problems of full fine-tuning. 
 
@@ -272,15 +272,15 @@ This model has the same number of parameters as the original, so there is little
 
 
 
-**How does rank decompostion matrices works in LoRA ?**
+**How does rank decompostion matrices works in LoRA ? **
 
 Let's look at a practical example using the transformer architecture described in the Attention is All You Need paper. The paper specifies that the transformer weights have dimensions of 512 by 64. This means that each weights matrix has 32,768 trainable parameters. 
 
-If you use LoRA as a fine-tuning method with the rank equal to 8, you will instead train two small rank decomposition matrices whose small dimension is 8. 
+If you use LoRA as a fine-tuning method with the rank equal to 8, you will instead train two small rank decomposition matrices whose small dimension is 8. This means that 
 
-This means that Matrix A will have dimensions of 8 by 64, resulting in 512 total parameters. 
+- Matrix A will have dimensions of 8 by 64, resulting in 512 total parameters. 
 
-Matrix B will have dimensions of 512 by 8, or 4,096 trainable parameters. 
+- Matrix B will have dimensions of 512 by 8, or 4,096 trainable parameters. 
 
 By updating the weights of these new low-rank matrices instead of the original weights, you'll be training 4,608 parameters instead of 32,768 and 86% reduction. 
 
@@ -296,7 +296,7 @@ You can also **combine LoRA with the quantization techniques to further reduce y
 
 
 
-**What is the limitation of prompt engineering ?**
+**What is the limitation of prompt engineering ? **
 
 Require a lot of **manual effort** to write and try different prompts, and the **length of context window is limited**. 
 
@@ -322,13 +322,13 @@ One potential issue to consider is the **interpretability of learned virtual tok
 
 ### Week3 :  Reinforcement learning and LLM-powered applications
 
-**What is the adavantage of aligning models with human values ?**
+**What is the adavantage of aligning models with human values ? **
 
 Additional fine-tuning with human feedback helps to better align models with human preferences and to **increase the helpfulness, honesty, and harmlessness of the completions**. This further training can also help to **decrease the toxicity**, often models responses and **reduce the generation of incorrect information**. 
 
 
 
-**How does RLHF work ?**
+**How does RLHF work ? **
 
 RLHF (Reinforcement Learning from Human Feedback) is a popular technique to finetune LLM with human feedback. In RLHF, **human labelers score a dataset of completions by the original model based on alignment criteria like helpfulness, harmlessness, and honesty**. This dataset is used to train the reward model that scores the model completions during the RLHF process.
 
@@ -396,7 +396,7 @@ inference latency  = inference time
 
 
 
-**What is the limitation of LLM and how could we reduce the negative effects ?**
+**What is the limitation of LLM and how could we reduce the negative effects ? **
 
 **LLMs do not carry out mathematical operations**. They are still just trying to predict the next best token based on their training, and as a result, can easily get the answer wrong. 
 
