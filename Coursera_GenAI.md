@@ -330,23 +330,7 @@ Additional fine-tuning with human feedback helps to better align models with hum
 
 **How does RLHF work ? **
 
-RLHF (Reinforcement Learning from Human Feedback) is a popular technique to finetune LLM with human feedback. In RLHF, **human labelers score a dataset of completions by the original model based on alignment criteria like helpfulness, harmlessness, and honesty**. This dataset is used to train the reward model that scores the model completions during the RLHF process.
-
-
-
-**What is reinforcement learning ?**
-
-Reinforcement learning is a type of machine learning in which **an agent learns to make decisions related to a specific goal by taking actions in an environment**, with the **objective of maximizing some notion of a cumulative reward**. The goal of reinforcement learning is for the agent to **learn the optimal policy for a given environment that maximizes their rewards**. In this framework, the agent continually learns from its experiences by taking actions, observing the resulting changes in the environment, and receiving rewards or penalties, based on the outcomes of its actions. By iterating through this process, the agent gradually refines its strategy or policy to make better decisions and increase its chances of success. 
-
-
-
-**What is proximal policy optimization ?**
-
-Proximal policy optimization (PPO for short) is popular algorithm for RLHF. **PPO optimizes a policy**, in this case the LLM, to be more aligned with human preferences. Over many iterations, PPO makes updates to the LLM. The updates are small and within a bounded region, **resulting in an updated LLM that is close to the previous version**, hence the name Proximal Policy Optimization. Keeping the changes within this small region result in a more stable learning. The goal is to update the policy so that the reward is maximized. 
-
-
-
-**How to obtain human feedbacks in RLHF ?**
+RLHF (Reinforcement Learning from Human Feedback) is a popular technique to finetune LLM with human feedback. In RLHF, **human labelers score a dataset of completions by the original model based on alignment criteria like helpfulness, harmlessness, and honesty**. This dataset is used to train the reward model that scores the model completions during the RLHF process. Therefore, human feedbacks are the most important ressources, you need to :  
 
 1. Define your model alignment criterion 
 
@@ -354,9 +338,21 @@ Proximal policy optimization (PPO for short) is popular algorithm for RLHF. **PP
 
 
 
-**What is KL-Divergence ?**
+**What is reinforcement learning ?**
 
-KL-Divergence, or Kullback-Leibler Divergence, is a concept often encountered in the field of reinforcement learning, particularly when using the Proximal Policy Optimization (PPO) algorithm. It is a **mathematical measure of the difference between two probability distributions, which helps us understand how one distribution differs from another**. In the context of PPO, KL-Divergence plays a crucial role in guiding the optimization process to ensure that the updated policy does not deviate too much from the original policy. 
+Reinforcement learning is a type of machine learning in which **an agent learns to make decisions related to a specific goal by taking actions in an environment**, with the **objective of maximizing a cumulative reward**. The goal of reinforcement learning is for the agent to **learn the optimal policy for a given environment that maximizes their rewards**. In this framework, the agent continually learns from its experiences by taking actions, observing the resulting changes in the environment, and receiving rewards or penalties, based on the outcomes of its actions. By iterating through this process, the agent gradually refines its strategy or policy to make better decisions and increase its chances of success. 
+
+
+
+**Known as a popular algorithm for RLHF, what is PPO (proximal policy optimization) ?**
+
+**PPO optimizes a policy**, in this case the LLM, to be more aligned with human preferences. Over many iterations, PPO makes updates of the policy to the LLM so that the reward is maximized. The updates are small and within a bounded region, **resulting in an updated LLM that is close to the previous version**, hence the name Proximal Policy Optimization. Keeping the changes within this small region result in a more stable learning. 
+
+
+
+**What is KL-Divergence (Kullback-Leibler Divergence) ?**
+
+KL-Divergence is a concept often encountered in the field of reinforcement learning, particularly when using the PPO algorithm. It is a **mathematical measure of the difference between two probability distributions, which helps us understand how one distribution differs from another**. In the context of PPO, KL-Divergence plays a crucial role in guiding the optimization process to ensure that the updated policy does not deviate too much from the original policy. 
 
 To understand how KL-Divergence works, imagine we have two probability distributions: the distribution of the original LLM, and a new proposed distribution of an RL-updated LLM. **KL-Divergence measures the average amount of information gained when we use the original policy to encode samples from the new proposed policy**. By minimizing the KL-Divergence between the two distributions, PPO ensures that the updated policy stays close to the original policy, preventing drastic changes that may negatively impact the learning process.
 
@@ -374,7 +370,7 @@ inference latency  = inference time
 
 - **Distillation** : have a larger teacher model to train a smaller student model, then use student model to lower the storage and compute budget.
 
-  - The idea of distillation is to freeze the teacher model's weights and use it to generate completions for your training data. At the same time, generate completions for the training data using your student model. The knowledge distillation between teacher and student model is achieved by minimizing a loss function called the distillation loss. To calculate this loss, distillation uses the probability distribution over tokens that is produced by the teacher model's softmax layer. Now, the teacher model is already fine tuned on the training data. So the probability distribution likely closely matches the ground truth data and won't have much variation in tokens. That's why Distillation applies a little trick adding a temperature parameter to the softmax function as a higher temperature increases the creativity of the language the model generates. With a temperature parameter greater than one, the probability distribution becomes broader and less strongly peaked. This softer distribution provides you with a set of tokens that are similar to the ground truth tokens. In the context of Distillation, the teacher model's output is often referred to as soft labels and the student model's predictions as soft predictions. In parallel, you train the student model to generate the correct predictions based on your ground truth training data. Here, you don't vary the temperature setting and instead use the standard softmax function. Distillation refers to the student model outputs as the hard predictions and hard labels. The loss between these two is the student loss. The combined distillation and student losses are used to update the weights of the student model via back propagation. 
+  - The idea of distillation is to freeze the teacher model's weights and use it to generate completions for training data. At the same time, generate completions for the training data using student model. The knowledge distillation between teacher and student model is achieved by minimizing a loss function called the distillation loss. To calculate this loss, distillation uses the probability distribution over tokens that is produced by the teacher model's softmax layer. Now, the teacher model is already fine tuned on the training data. So the probability distribution likely closely matches the ground truth data and won't have much variation in tokens. That's why Distillation applies a little trick adding a temperature parameter to the softmax function as a higher temperature increases the creativity of the language the model generates. With a temperature parameter greater than one, the probability distribution becomes broader and less strongly peaked. This softer distribution provides you with a set of tokens that are similar to the ground truth tokens. In the context of Distillation, the teacher model's output is often referred to as soft labels and the student model's predictions as soft predictions. In parallel, you train the student model to generate the correct predictions based on your ground truth training data. Here, you don't vary the temperature setting and instead use the standard softmax function. Distillation refers to the student model outputs as the hard predictions and hard labels. The loss between these two is the student loss. The combined distillation and student losses are used to update the weights of the student model via back propagation. 
 
   - The key benefit of distillation methods is that the smaller student model can be used for inference in deployment instead of the teacher model. In practice, **distillation is not as effective for generative decoder models. It's typically more effective for encoder only models**, such as BERT that have a lot of representation redundancy. With distillation, you're training a second, smaller model to use during inference. You aren't reducing the model size of the initial LLM in any way.
 
@@ -398,9 +394,7 @@ inference latency  = inference time
 
 **What is the limitation of LLM and how could we reduce the negative effects ? **
 
-**LLMs do not carry out mathematical operations**. They are still just trying to predict the next best token based on their training, and as a result, can easily get the answer wrong. 
-
-**RAG (Retrieval Augmented Generation)** is a framework for building LLM powered systems that **make use of external data sources to overcome some of the limitations of these models** (like **knowledge cut-off issue**, or **model hallucinations** when it doesn't know the answer). A flexible and less expensive way to overcome knowledge cutoffs is to give your model access to additional external data at inference time. There are 2 considerations for using external data in RAG :
+**LLMs do not carry out mathematical operations**. They are still just trying to predict the next best token based on their training, and as a result, can easily get the answer wrong. To reduce this effect, **RAG (Retrieval Augmented Generation)** is a framework for building LLM powered systems that **make use of external data sources to overcome some of the limitations of these models** (like **knowledge cut-off issue**, or **model hallucinations** when it doesn't know the answer). A flexible and less expensive way to overcome knowledge cutoffs is to give your model access to additional external data at inference time. There are 2 considerations for using external data in RAG :
 
 - Data must fit inside context window (split long sources into short chunks)
 
