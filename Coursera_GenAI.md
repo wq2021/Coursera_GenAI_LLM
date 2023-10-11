@@ -324,7 +324,7 @@ One potential issue to consider is the **interpretability of learned virtual tok
 
 **What is the adavantage of aligning models with human values ? **
 
-Additional fine-tuning with human feedback helps to better align models with human preferences and to **increase the helpfulness, honesty, and harmlessness of the completions**. This further training can also help to **decrease the toxicity**, often models responses and **reduce the generation of incorrect information**. 
+Additional fine-tuning with human feedback helps to better align models with human preferences and to **increase the helpfulness, honesty, and harmlessness of the completions**. This further training can also help to **decrease the toxicity**, and **reduce the generation of incorrect information**. 
 
 
 
@@ -368,11 +368,9 @@ inference latency  = inference time
 
 [LLM optimization techniques before deploying it for inference](https://www.coursera.org/learn/generative-ai-with-llms/lecture/qojKp/model-optimizations-for-deployment)
 
-- **Distillation** : have a larger teacher model to train a smaller student model, then use student model to lower the storage and compute budget.
+- **Distillation** : train a smaller student model from a larger teacher model, then use student model for inference in deployment instead of the teacher model to lower the storage and compute budget.
 
   - The idea of distillation is to freeze the teacher model's weights and use it to generate completions for training data. At the same time, generate completions for the training data using student model. The knowledge distillation between teacher and student model is achieved by minimizing a loss function called the distillation loss. To calculate this loss, distillation uses the probability distribution over tokens that is produced by the teacher model's softmax layer. Now, the teacher model is already fine tuned on the training data. So the probability distribution likely closely matches the ground truth data and won't have much variation in tokens. That's why Distillation applies a little trick adding a temperature parameter to the softmax function as a higher temperature increases the creativity of the language the model generates. With a temperature parameter greater than one, the probability distribution becomes broader and less strongly peaked. This softer distribution provides you with a set of tokens that are similar to the ground truth tokens. In the context of Distillation, the teacher model's output is often referred to as soft labels and the student model's predictions as soft predictions. In parallel, you train the student model to generate the correct predictions based on your ground truth training data. Here, you don't vary the temperature setting and instead use the standard softmax function. Distillation refers to the student model outputs as the hard predictions and hard labels. The loss between these two is the student loss. The combined distillation and student losses are used to update the weights of the student model via back propagation. 
-
-  - The key benefit of distillation methods is that the smaller student model can be used for inference in deployment instead of the teacher model. In practice, **distillation is not as effective for generative decoder models. It's typically more effective for encoder only models**, such as BERT that have a lot of representation redundancy. With distillation, you're training a second, smaller model to use during inference. You aren't reducing the model size of the initial LLM in any way.
 
 - **Quantization (quantization aware training / QAT)**: transform a model's weight to a lower precision representation, such as 16-bit floating point or 8-bit integer, which can reduce the memory footprint of the model.
   
@@ -384,17 +382,21 @@ inference latency  = inference time
 
 **Describe time and effort consumed in the lifecycle of GenAI Project**
 
-- **Pretraining** : require high expertise and take from days to weeks to months (but at the most of times, you're prone to start with a foundation model)
-- **Prompt engineering (assess the model's performance when starting with a foundation model)** : require less technical expertise, and no addtional training of the model.
-- **Prompt tuning and fine-tuning (if the modeling isn't performing as you need)**: full finetuning or peft (LoRA or prompt tuning) depending on use cases, performance goals and compute budget. But since fine-tuning can be very successful with a relatively small training dataset, this phase could potentially be completed in a single day.
-- **Reinforcement learning and human feedback** : require relevant expertise and similar time to fine-tuning if you can use an existing reward model. But it would take a long time to train a reward model from scratch because if need much efforts to gather human feedback. The goal is to update LLM model weights by adding a seperate reward model to align with human goals (helpful, honest and harmless).
-- **Compression / optimization / deployment**
+1. **Pretraining** : require high expertise and take from days to weeks to months (but at the most of times, you're prone to start with a foundation model)
+
+2. **Prompt engineering (assess the model's performance when starting with a foundation model)** : require less technical expertise, and no addtional training of the model.
+
+3. **Prompt tuning and fine-tuning (if the modeling isn't performing as you need)**: full finetuning or choose PEFT method (LoRA or prompt tuning) depending on use cases, performance goals and compute budget. But since fine-tuning can be very successful with a relatively small training dataset, this phase could potentially be completed in a single day.
+
+4. **Reinforcement learning with human feedback** : require relevant expertise and similar time to fine-tune if you can use an existing reward model. But it would take a long time to train a reward model from scratch because it needs much efforts to gather human feedback. The goal is to update LLM model weights by adding a seperate reward model to align with human goals (helpful, honest and harmless).
+
+5. **Compression / optimization / deployment**
 
 
 
 **What is the limitation of LLM and how could we reduce the negative effects ? **
 
-**LLMs do not carry out mathematical operations**. They are still just trying to predict the next best token based on their training, and as a result, can easily get the answer wrong. To reduce this effect, **RAG (Retrieval Augmented Generation)** is a framework for building LLM powered systems that **make use of external data sources to overcome some of the limitations of these models** (like **knowledge cut-off issue**, or **model hallucinations** when it doesn't know the answer). A flexible and less expensive way to overcome knowledge cutoffs is to give your model access to additional external data at inference time. There are 2 considerations for using external data in RAG :
+**LLMs do not carry out mathematical operations**. They are still just trying to predict the next best token based on their training, and as a result, can easily get the answer wrong. In other words, complex reasoning can be challenging for LLMs. To reduce this effect, **RAG (Retrieval Augmented Generation)** is a framework for building LLM powered systems that **make use of external data sources to overcome some of the limitations of these models** (like **knowledge cut-off issue**, or **model hallucinations** when it doesn't know the answer). A flexible and less expensive way to overcome knowledge cutoffs is to give your model access to additional external data at inference time. There are 2 considerations for using external data in RAG :
 
 - Data must fit inside context window (split long sources into short chunks)
 
@@ -404,29 +406,32 @@ inference latency  = inference time
 
 **How does RAG work ?**
 
-RAG methods take the small chunks of external data and process them through the LLM, to **create embedding vectors** for each. These new representations of the data can be stored in structures called **vector stores**, which allow for **fast searching of datasets and efficient identification of semantically related text**. Vector databases are a particular implementation of a vector store where each vector is also identified by a key. This can allow, for instance, the text generated by RAG to also include a citation for the document from which it was received. 
+RAG is a framework for building LLM powered systems that use external data sources at inference time. 
+
+In the earliest papers on RAG by researchers at Facebook published in 2020, the core of RAG is a model component called Retriever, which consists of a query encoder and an external data source. The encoder takes user’s input prompt and encodes it into a form that can be used to query the data source. These two components are trained together to find documents within external data that are most relevant to the input query. The Retriever returns the best single or group of documents from data sources and combines the new information with the original user query. The new expanded prompt memory is then passed to LLM, which generates a completion. 
+
+The external data sources can be in multiple types in RAG : 
+
+- Documents
+- Wikis
+- Web pages
+- Databases (encode user input prompt as a SQL query)
+- Vector store : enable a fast and efficient kind of relevant search based on similarity
+
+There are 2 considerations for preparing data for vector store in RAG :
+
+1. Data must fit inside context window (long sources => short chunks, which can be done by [Langchain](https://python.langchain.com/docs/get_started/introduction) package).
+2. Data must be in format, like embedding vectors, that allows its relevance to be assessed at reference time. These embedding vectors allow the LLM to identify semantically related words through measures such as cosine similarity. RAG takes small chunks of external data and process them through the LLM to create embedding vectors for each. Theses data representations can be stored in structured vector stores, which allow for fast searching of datasets and efficient identification of semantically related text. Vector datasets are a particular implementation of vector store where each vector is also identified by a key. This can allow the text generated by RAG to include a citation for the document from which it was received.
 
 
 
-**What is PAL ?**
-
-PAL (program-aided language models) is an interesting framework for **augmenting LLMs** as complex reasoning can be challenging for LLMs, especially for problems that involve multiple steps or mathematics. The strategy behind PAL is to have the LLM generate completions where **reasoning steps are accompanied by computer code**.
+**Beside from RAG, PAL (program-aided language models) is a framework for helping LLM generate completions where reasoning steps are accompanied by compute code. How does it work actually ?**
 
 To prepare for inference with PAL, you'll format your prompt to contain one or more examples. Each example should contain a question followed by reasoning steps in lines of Python code that solve the problem. Next, you will append the new question that you'd like to answer to the prompt template.
 
-
-
-In general, connecting LLMs to external applications allows the model to interact with the broader world, extending their utility beyond language tasks. LLMs can be used to trigger actions when given the ability to interact with APIs. LLMs can also connect to other programming resources. For example, a Python interpreter that can enable models to incorporate accurate calculations into their outputs. 
-
-
-
-**What is chain of thought prompting ?**
+In general, connecting LLMs to external applications allows the model to interact with the broader world, extending their utility beyond language tasks. LLMs can be used to trigger actions when given the ability to interact with APIs. LLMs can also connect to other programming resources. For example, a Python interpreter that can enable models to incorporate accurate calculations into their outputs.
 
 Asking the model to mimic reasoning behavior is known as chain of thought prompting. It works by **including a series of intermediate reasoning steps** into any examples that you use for one or few-shot inference. 
-
-
-
-**What are the benefits of  chain of thought prompting ?**
 
 Chain of thought prompting is a powerful technique that **improves the ability of your model to reason through problems**. While this can greatly improve the performance of your model, the limited math skills of LLMs can still cause problems if your task requires accurate calculations, like totaling sales on an e-commerce site, calculating tax, or applying a discount. You can overcome this limitation by **allowing your model to interact with external applications** that are good at math, like a Python interpreter. 
 
@@ -453,3 +458,18 @@ The models are deployed on the appropriate infrastructure for your inference nee
 In the final layer, you typically have some type of **user interface** that the application will be consumed through, such as a website or a rest API. This layer is where you'll also include the **security components required for interacting with your application**. At a high level, this architecture stack represents the various components to consider as part of your generative AI applications. Your users, whether they are human end-users or other systems that access your application through its APIs, will interact with this entire stack. As you can see, the model is typically only one part of the story in building end-to-end generative AI applications.
 
 Frameworks like LangChain are making it possible to quickly build, deploy, and test LLM powered applications, and it's a very exciting time for developers. 
+
+
+
+Prompt with one-shot example 
+
+Q: The canteen consumed 45 bags of rice in January, 3 bags less in February compared to January and 2 bags less in March compared to February. How many bags of rice were consumed in March?
+
+Answer :
+
+
+
+Q : 
+
+Answer : There were 7 pear trees, 12 apricot trees and 15 peach trees planted in the school. How many fruit trees are there now?
+
